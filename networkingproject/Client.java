@@ -91,8 +91,6 @@ public class Client {
 
         jButtons.add(sendFile);
         jButtons.add(chooseFile);
-        
-       
 
         connect.addActionListener(new ActionListener() {
             @Override
@@ -102,10 +100,11 @@ public class Client {
                 } else {
                     try {
                         Socket socket = new Socket(hostNo, portNo);
-                        if(socket.isConnected()){
-                            conState.setText("connected on port "+portNo);
+                        if (socket.isConnected()) {
+                            conState.setText("connected on port " + portNo);
                             sendFile.setEnabled(true);
                             chooseFile.setEnabled(true);
+                            socket.close();
                         }
                     } catch (IOException ex) {
                         conState.setText("error occured");
@@ -137,21 +136,31 @@ public class Client {
                     fileName.setText("please choose a file first!!!");
                 } else {
                     try {
-                        FileInputStream fis = new FileInputStream(fileToSend[0].getAbsolutePath());
                         if (hostNo.isEmpty() || Integer.toString(portNo).isEmpty()) {
                             fileName.setText("please select host and port address");
                         } else {
+
+                            FileInputStream fileInputStream = new FileInputStream(fileToSend[0].getAbsolutePath());
+
                             Socket socket = new Socket(hostNo, portNo);
-                            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 
-                            String FileName = fileToSend[0].getName();
-                            byte[] FileNameBytes = FileName.getBytes();
-                            byte[] FileBytes = new byte[(int) fileToSend[0].length()];
+                            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
-                            fis.read(FileBytes);
-                            dos.writeInt(FileNameBytes.length);
-                            dos.write(FileNameBytes);
-                            dos.write(FileBytes);
+                            String fileName = fileToSend[0].getName();
+
+                            byte[] fileNameBytes = fileName.getBytes();
+
+                            byte[] fileBytes = new byte[(int) fileToSend[0].length()];
+
+                            fileInputStream.read(fileBytes);
+
+                            dataOutputStream.writeInt(fileNameBytes.length);
+
+                            dataOutputStream.write(fileNameBytes);
+
+                            dataOutputStream.writeInt(fileBytes.length);
+
+                            dataOutputStream.write(fileBytes);
                         }
                     } catch (IOException error) {
                         fileName.setText("error occured when sending the file " + fileToSend[0].getName());
