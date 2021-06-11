@@ -112,6 +112,19 @@ public class Server {
                         myFiles.add(new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName)));
 
                         fileId++;
+
+                        File fileToSave = new File("src/server_files/" + fileName);
+                        try {
+
+                            FileOutputStream fileOutputStream = new FileOutputStream(fileToSave);
+
+                            fileOutputStream.write(fileContentBytes);
+
+                            fileOutputStream.close();
+
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             } catch (IOException e) {

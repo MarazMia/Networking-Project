@@ -12,7 +12,7 @@ package networkingproject;
 class MyFile {
 
     private int id;
-    private String name;
+    String name;
     private byte[] data;
     private String fileExtension;
 
