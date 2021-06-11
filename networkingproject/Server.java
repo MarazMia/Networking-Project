@@ -17,11 +17,26 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+
 public class Server {
 
     // Array list to hold information about the files received.
     static ArrayList<MyFile> myFiles = new ArrayList<>();
+    static ArrayList<MyFile> allFiles = new ArrayList<>();
+    static ServerSocket serverSocket;
+    static Socket socket;
+    static DataInputStream dis;
+    static FileOutputStream fos;
+    static OutputStream os;
 
+    /*Server() throws IOException{
+        //fileNames();
+        serverSocket = new ServerSocket(1234);
+        socket = serverSocket.accept();
+        dis = new DataInputStream(socket.getInputStream());
+        fos = new FileOutputStream("src/server_files/");
+        //sendFile();
+    }*/
     public static void main(String[] args) throws IOException {
 
         int fileId = 0;
@@ -55,13 +70,18 @@ public class Server {
 
         jFrame.setVisible(true);
 
-        ServerSocket serverSocket = new ServerSocket(1234);
+        fileNames();
+        System.out.println(allFiles.size());
+        serverSocket = new ServerSocket(1234);
+        socket = serverSocket.accept();
+        
+        os = socket.getOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(os);
+        oos.writeObject(allFiles);
 
         while (true) {
 
             try {
-
-                Socket socket = serverSocket.accept();
 
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
@@ -92,7 +112,7 @@ public class Server {
                         if (getFileExtension(fileName).equalsIgnoreCase("txt")) {
 
                             jpFileRow.setName((String.valueOf(fileId)));
-                            jpFileRow.addMouseListener(getMyMouseListener());
+                            //jpFileRow.addMouseListener(getMyMouseListener());
 
                             jpFileRow.add(jlFileName);
                             jPanel.add(jpFileRow);
@@ -101,7 +121,7 @@ public class Server {
 
                             jpFileRow.setName((String.valueOf(fileId)));
 
-                            jpFileRow.addMouseListener(getMyMouseListener());
+                            //jpFileRow.addMouseListener(getMyMouseListener());
 
                             jpFileRow.add(jlFileName);
                             jPanel.add(jpFileRow);
@@ -277,6 +297,34 @@ public class Server {
         jFrame.add(jPanel);
 
         return jFrame;
+
+    }
+
+    public static void fileNames() throws IOException {
+        int fileId = 0;
+        File dir = new File("src/server_files");
+        File[] listOfFiles = dir.listFiles();
+        for (File file : listOfFiles) {
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
+                String fileName = file.getName();
+                byte[] fileContentBytes = new byte[(int) file.length()];
+                if ((int) file.length() > 0) {
+                    fileInputStream.read(fileContentBytes);
+                }
+
+                MyFile newFile = new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName));
+                newFile.setData(fileContentBytes);
+                allFiles.add(newFile);
+                fileId++;
+
+                System.out.println(newFile.getId() + " " + newFile.getName() + " " + newFile.getData().length + " " + newFile.getFileExtension());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 

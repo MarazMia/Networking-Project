@@ -5,16 +5,20 @@
  */
 package networkingproject;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Maraz Mia
  */
-class MyFile {
+public class MyFile implements Serializable{
+    
+    public static final long serialVersionUID = 1L;
 
-    private int id;
-    String name;
-    private byte[] data;
-    private String fileExtension;
+    public int id;
+    public String name;
+    public byte[] data;
+    public String fileExtension;
 
     public MyFile(int id, String name, byte[] data, String fileExtension) {
         this.id = id;
