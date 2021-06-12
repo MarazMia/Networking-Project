@@ -82,20 +82,21 @@ public class Client {
         //button part
         JPanel jButtons = new JPanel();
         jButtons.setBorder(new EmptyBorder(75, 0, 10, 0));
+        jButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JButton sendFile = new JButton("send");
-        sendFile.setPreferredSize(new Dimension(150, 75));
-        sendFile.setFont(new Font("Arial", Font.BOLD, 20));
+        sendFile.setPreferredSize(new Dimension(100, 75));
+        sendFile.setFont(new Font("Arial", Font.BOLD, 15));
         sendFile.setEnabled(false);
 
         JButton chooseFile = new JButton("choose");
-        chooseFile.setPreferredSize(new Dimension(150, 75));
-        chooseFile.setFont(new Font("Arial", Font.BOLD, 20));
+        chooseFile.setPreferredSize(new Dimension(100, 75));
+        chooseFile.setFont(new Font("Arial", Font.BOLD, 15));
         chooseFile.setEnabled(false);
 
         JButton seeFile = new JButton("files");
-        seeFile.setPreferredSize(new Dimension(150, 75));
-        seeFile.setFont(new Font("Arial", Font.BOLD, 20));
+        seeFile.setPreferredSize(new Dimension(100, 75));
+        seeFile.setFont(new Font("Arial", Font.BOLD, 15));
         seeFile.setEnabled(false);
 
         jButtons.add(sendFile);
@@ -173,6 +174,7 @@ public class Client {
                             dataOutputStream.writeInt(fileBytes.length);
 
                             dataOutputStream.write(fileBytes);
+                            allFiles.add(new MyFile(allFiles.size(), fileName, fileBytes, getFileExtension(fileName)));
                         }
                     } catch (IOException error) {
                         fileName.setText("error occured when sending the file " + fileToSend[0].getName());
@@ -193,7 +195,6 @@ public class Client {
                 jFrame.setLayout(new BoxLayout(jFrame.getContentPane(), BoxLayout.Y_AXIS));
 
                 //jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
                 JPanel jPanel = new JPanel();
 
                 jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.Y_AXIS));
@@ -217,34 +218,36 @@ public class Client {
                 for (MyFile file : allFiles) {
 
                     JPanel jpFileRow = new JPanel();
-                        jpFileRow.setLayout(new BoxLayout(jpFileRow, BoxLayout.X_AXIS));
+                    jpFileRow.setLayout(new BoxLayout(jpFileRow, BoxLayout.X_AXIS));
 
-                        JLabel jlFileName = new JLabel(file.name);
-                        jlFileName.setFont(new Font("Arial", Font.BOLD, 20));
-                        jlFileName.setBorder(new EmptyBorder(10, 0, 10, 0));
-                        if (getFileExtension(file.name).equalsIgnoreCase("txt")) {
+                    JLabel jlFileName = new JLabel(file.name);
+                    jlFileName.setFont(new Font("Arial", Font.BOLD, 20));
+                    jlFileName.setBorder(new EmptyBorder(10, 0, 10, 0));
+                    if (getFileExtension(file.name).equalsIgnoreCase("txt")) {
 
-                            jpFileRow.setName((String.valueOf(file.id)));
-                            jpFileRow.addMouseListener(getMyMouseListener());
+                        jpFileRow.setName((String.valueOf(file.id)));
+                        jpFileRow.addMouseListener(getMyMouseListener());
 
-                            jpFileRow.add(jlFileName);
-                            jPanel.add(jpFileRow);
-                            jFrame.validate();
-                        } else {
+                        jpFileRow.add(jlFileName);
+                        jPanel.add(jpFileRow);
+                        jFrame.validate();
+                    } else {
 
-                            jpFileRow.setName((String.valueOf(file.id)));
+                        jpFileRow.setName((String.valueOf(file.id)));
 
-                            jpFileRow.addMouseListener(getMyMouseListener());
+                        jpFileRow.addMouseListener(getMyMouseListener());
 
-                            jpFileRow.add(jlFileName);
-                            jPanel.add(jpFileRow);
+                        jpFileRow.add(jlFileName);
+                        jPanel.add(jpFileRow);
 
-                            jFrame.validate();
-                        }
+                        jFrame.validate();
+                    }
                 }
             }
 
         });
+        
+        //adding everything on our main window
 
         window.add(intro);
         window.add(option);
@@ -252,8 +255,9 @@ public class Client {
         window.add(fileName);
         window.add(jButtons);
         window.setVisible(true);
+
     }
-    
+
     public static MouseListener getMyMouseListener() {
         return new MouseListener() {
             @Override
@@ -331,6 +335,7 @@ public class Client {
         jbNo.setFont(new Font("Arial", Font.BOLD, 20));
 
         JLabel jlFileContent = new JLabel();
+        jlFileContent.setBorder(new EmptyBorder(100,0,10,0));
 
         jlFileContent.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -388,7 +393,7 @@ public class Client {
         return jFrame;
 
     }
-    
+
     public static String getFileExtension(String fileName) {
 
         int i = fileName.lastIndexOf('.');
