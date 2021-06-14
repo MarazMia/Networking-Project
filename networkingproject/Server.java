@@ -17,7 +17,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-
 public class Server {
 
     // Array list to hold information about the files received.
@@ -74,10 +73,12 @@ public class Server {
         System.out.println(allFiles.size());
         serverSocket = new ServerSocket(1234);
         socket = serverSocket.accept();
-        
-        os = socket.getOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(os);
-        oos.writeObject(allFiles);
+
+        if (socket.isConnected()) {
+            os = socket.getOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(os);
+            oos.writeObject(allFiles);
+        }
 
         while (true) {
 
@@ -112,7 +113,6 @@ public class Server {
                         if (getFileExtension(fileName).equalsIgnoreCase("txt")) {
 
                             jpFileRow.setName((String.valueOf(fileId)));
-                            
 
                             jpFileRow.add(jlFileName);
                             jPanel.add(jpFileRow);
@@ -120,8 +120,6 @@ public class Server {
                         } else {
 
                             jpFileRow.setName((String.valueOf(fileId)));
-
-                            
 
                             jpFileRow.add(jlFileName);
                             jPanel.add(jpFileRow);
@@ -151,7 +149,7 @@ public class Server {
                 e.printStackTrace();
             }
         }
-        
+
     }
 
     public static String getFileExtension(String fileName) {

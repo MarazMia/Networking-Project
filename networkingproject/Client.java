@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.border.EmptyBorder;
-import static networkingproject.Server.myFiles;
 
 /**
  *
@@ -26,37 +25,35 @@ public class Client {
 
     static Socket socket;
     static ArrayList<MyFile> allFiles = new ArrayList<>();
+    static File[] fileToSend = new File[1];
+    static String hostNo;
+    static int portNo;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-
-        final File[] fileToSend = new File[1];
-        final String hostNo;
-        final int portNo;
-
         //our project window
         JFrame window = new JFrame("Networking Project");
         window.setSize(450, 450);
         window.setLayout(new BoxLayout(window.getContentPane(), BoxLayout.Y_AXIS));
+        window.getContentPane().setBackground(Color.GREEN);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //introductory text
         JLabel intro = new JLabel("Client Side GUI");
         intro.setFont(new Font("Arial", Font.BOLD, 25));
-        intro.setBorder(new EmptyBorder(20, 0, 10, 0));
+        intro.setBorder(new EmptyBorder(5, 0, 5, 0));
         intro.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         //host and port option
         JPanel option = new JPanel();
-        option.setBorder(new EmptyBorder(50, 0, 0, 0));
+        option.setBorder(new EmptyBorder(5, 0, 0, 0));
         option.setFont(new Font("Arial", Font.BOLD, 20));
+        option.setBackground(Color.RED);
 
         JLabel hl = new JLabel("host   ");
         JTextField hostOption = new JTextField("localhost", 10);
-        hostNo = hostOption.getText().toString().trim();
+
         JLabel pl = new JLabel("port   ");
         JTextField portOption = new JTextField("1234", 10);
-        String prtn = portOption.getText().toString().trim();
-        portNo = Integer.parseInt(prtn);
         JButton connect = new JButton("connetct");
 
         option.add(hl);
@@ -66,36 +63,47 @@ public class Client {
         option.add(connect);
 
         JPanel conPane = new JPanel();
-        conPane.setBorder(new EmptyBorder(50, 0, 0, 0));
+        conPane.setBorder(new EmptyBorder(5, 0, 0, 0));
         conPane.setFont(new Font("Arial", Font.BOLD, 20));
+        conPane.setBackground(Color.GREEN);
+        conPane.setAlignmentY(Component.CENTER_ALIGNMENT);
         JLabel con = new JLabel("connection status");
-        JTextField conState = new JTextField("not connected", 10);
+        JTextField conState = new JTextField("not connected", 18);
+        JButton refresh = new JButton("connetct");
+        
+        
+        
         conPane.add(con);
         conPane.add(conState);
-
+        conPane.add(refresh);
+        
         //file name label
+        JPanel fN = new JPanel();
         JLabel fileName = new JLabel("choose a file to send...");
-        fileName.setBorder(new EmptyBorder(50, 0, 0, 0));
+        fileName.setBorder(new EmptyBorder(5, 0, 0, 0));
         fileName.setFont(new Font("Arial", Font.BOLD, 20));
         fileName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        fN.setBackground(Color.RED);
+        fN.add(fileName);
 
         //button part
         JPanel jButtons = new JPanel();
-        jButtons.setBorder(new EmptyBorder(75, 0, 10, 0));
+        jButtons.setBorder(new EmptyBorder(50, 0, 10, 0));
         jButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
+        jButtons.setBackground(Color.RED);
+        
+        
+        
 
         JButton sendFile = new JButton("send");
-        sendFile.setPreferredSize(new Dimension(100, 75));
         sendFile.setFont(new Font("Arial", Font.BOLD, 15));
         sendFile.setEnabled(false);
 
         JButton chooseFile = new JButton("choose");
-        chooseFile.setPreferredSize(new Dimension(100, 75));
         chooseFile.setFont(new Font("Arial", Font.BOLD, 15));
         chooseFile.setEnabled(false);
 
         JButton seeFile = new JButton("files");
-        seeFile.setPreferredSize(new Dimension(100, 75));
         seeFile.setFont(new Font("Arial", Font.BOLD, 15));
         seeFile.setEnabled(false);
 
@@ -103,26 +111,39 @@ public class Client {
         jButtons.add(chooseFile);
         jButtons.add(seeFile);
 
-        socket = new Socket(hostNo, portNo);
-
-        InputStream is = socket.getInputStream();
-        ObjectInputStream ois = new ObjectInputStream(is);
-        allFiles = (ArrayList<MyFile>) ois.readObject();
-        System.out.println(allFiles.size());
-
         connect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
+                hostNo = hostOption.getText().toString().trim();
+                String prtn = portOption.getText().toString().trim();
+                portNo = Integer.parseInt(prtn);
                 if (hostNo.isEmpty() || Integer.toString(portNo).isEmpty()) {
                     intro.setText("please select host and port address");
                 } else {
-                    //Socket socket = new Socket(hostNo, portNo);
+                    try {
+                        socket = new Socket(hostNo, portNo);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                        conState.setText("error occured");
+                    }
                     if (socket.isConnected()) {
                         conState.setText("connected on port " + portNo);
                         sendFile.setEnabled(true);
                         chooseFile.setEnabled(true);
                         seeFile.setEnabled(true);
-                        //socket.close();
+
+                        try {
+
+                            InputStream is = socket.getInputStream();
+                            ObjectInputStream ois = new ObjectInputStream(is);
+                            allFiles = (ArrayList<MyFile>) ois.readObject();
+                            System.out.println(allFiles.size());
+                        } catch (ClassNotFoundException err) {
+                            err.printStackTrace();
+                            conState.setText("error occured");
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
@@ -155,8 +176,6 @@ public class Client {
                         } else {
 
                             FileInputStream fileInputStream = new FileInputStream(fileToSend[0].getAbsolutePath());
-
-                            //Socket socket = new Socket(hostNo, portNo);
                             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
                             String fileName = fileToSend[0].getName();
@@ -246,13 +265,12 @@ public class Client {
             }
 
         });
-        
-        //adding everything on our main window
 
+        //adding everything on our main window
         window.add(intro);
         window.add(option);
         window.add(conPane);
-        window.add(fileName);
+        window.add(fN);
         window.add(jButtons);
         window.setVisible(true);
 
@@ -335,7 +353,7 @@ public class Client {
         jbNo.setFont(new Font("Arial", Font.BOLD, 20));
 
         JLabel jlFileContent = new JLabel();
-        jlFileContent.setBorder(new EmptyBorder(100,0,10,0));
+        jlFileContent.setBorder(new EmptyBorder(100, 0, 10, 0));
 
         jlFileContent.setAlignmentX(Component.CENTER_ALIGNMENT);
 
