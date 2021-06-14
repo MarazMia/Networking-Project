@@ -69,13 +69,12 @@ public class Client {
         conPane.setAlignmentY(Component.CENTER_ALIGNMENT);
         JLabel con = new JLabel("connection status");
         JTextField conState = new JTextField("not connected", 18);
-        JButton refresh = new JButton("connetct");
+        
         
         
         
         conPane.add(con);
         conPane.add(conState);
-        conPane.add(refresh);
         
         //file name label
         JPanel fN = new JPanel();
@@ -95,21 +94,26 @@ public class Client {
         
         
 
-        JButton sendFile = new JButton("send");
+        JButton sendFile = new JButton("upload");
         sendFile.setFont(new Font("Arial", Font.BOLD, 15));
         sendFile.setEnabled(false);
 
-        JButton chooseFile = new JButton("choose");
+        JButton chooseFile = new JButton("select");
         chooseFile.setFont(new Font("Arial", Font.BOLD, 15));
         chooseFile.setEnabled(false);
 
-        JButton seeFile = new JButton("files");
+        JButton seeFile = new JButton("seefile");
         seeFile.setFont(new Font("Arial", Font.BOLD, 15));
         seeFile.setEnabled(false);
+        
+        JButton delete = new JButton("delete");
+        delete.setFont(new Font("Arial", Font.BOLD, 15));
+        delete.setEnabled(false);
 
         jButtons.add(sendFile);
         jButtons.add(chooseFile);
         jButtons.add(seeFile);
+        jButtons.add(delete);
 
         connect.addActionListener(new ActionListener() {
             @Override
@@ -131,6 +135,7 @@ public class Client {
                         sendFile.setEnabled(true);
                         chooseFile.setEnabled(true);
                         seeFile.setEnabled(true);
+                        delete.setEnabled(true);
 
                         try {
 
