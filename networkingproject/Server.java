@@ -138,6 +138,7 @@ public class Server {
                             }
 
                             myFiles.add(new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName)));
+                            allFiles.add(new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName)));
 
                             fileId++;
 
