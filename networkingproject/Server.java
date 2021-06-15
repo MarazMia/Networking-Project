@@ -15,6 +15,8 @@ import java.awt.event.MouseListener;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Server {
@@ -27,6 +29,8 @@ public class Server {
     static DataInputStream dis;
     static FileOutputStream fos;
     static OutputStream os;
+    static String message;
+    static boolean flag = false;
 
     /*Server() throws IOException{
         //fileNames();
@@ -71,82 +75,119 @@ public class Server {
 
         fileNames();
         System.out.println(allFiles.size());
+
         serverSocket = new ServerSocket(1234);
         socket = serverSocket.accept();
-
-        if (socket.isConnected()) {
-            os = socket.getOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(os);
-            oos.writeObject(allFiles);
-        }
+        
+        
 
         while (true) {
 
             try {
+                
 
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
-                int fileNameLength = dataInputStream.readInt();
+                //message has been catched
+                int operationLength = dataInputStream.readInt();
+                byte[] opbyte = new byte[operationLength];
+                dataInputStream.readFully(opbyte, 0, opbyte.length);
+                String opName = new String(opbyte);
 
-                if (fileNameLength > 0) {
+                if (opName.equals("upload")) {
 
-                    byte[] fileNameBytes = new byte[fileNameLength];
+                    int fileNameLength = dataInputStream.readInt();
 
-                    dataInputStream.readFully(fileNameBytes, 0, fileNameBytes.length);
+                    if (fileNameLength > 0) {
 
-                    String fileName = new String(fileNameBytes);
+                        byte[] fileNameBytes = new byte[fileNameLength];
 
-                    int fileContentLength = dataInputStream.readInt();
+                        dataInputStream.readFully(fileNameBytes, 0, fileNameBytes.length);
 
-                    if (fileContentLength > 0) {
+                        String fileName = new String(fileNameBytes);
 
-                        byte[] fileContentBytes = new byte[fileContentLength];
+                        int fileContentLength = dataInputStream.readInt();
 
-                        dataInputStream.readFully(fileContentBytes, 0, fileContentBytes.length);
+                        if (fileContentLength > 0) {
 
-                        JPanel jpFileRow = new JPanel();
-                        jpFileRow.setLayout(new BoxLayout(jpFileRow, BoxLayout.X_AXIS));
+                            byte[] fileContentBytes = new byte[fileContentLength];
 
-                        JLabel jlFileName = new JLabel(fileName);
-                        jlFileName.setFont(new Font("Arial", Font.BOLD, 20));
-                        jlFileName.setBorder(new EmptyBorder(10, 0, 10, 0));
-                        if (getFileExtension(fileName).equalsIgnoreCase("txt")) {
+                            dataInputStream.readFully(fileContentBytes, 0, fileContentBytes.length);
 
-                            jpFileRow.setName((String.valueOf(fileId)));
+                            JPanel jpFileRow = new JPanel();
+                            jpFileRow.setLayout(new BoxLayout(jpFileRow, BoxLayout.X_AXIS));
 
-                            jpFileRow.add(jlFileName);
-                            jPanel.add(jpFileRow);
-                            jFrame.validate();
-                        } else {
+                            JLabel jlFileName = new JLabel(fileName);
+                            jlFileName.setFont(new Font("Arial", Font.BOLD, 20));
+                            jlFileName.setBorder(new EmptyBorder(10, 0, 10, 0));
+                            if (getFileExtension(fileName).equalsIgnoreCase("txt")) {
 
-                            jpFileRow.setName((String.valueOf(fileId)));
+                                jpFileRow.setName((String.valueOf(fileId)));
 
-                            jpFileRow.add(jlFileName);
-                            jPanel.add(jpFileRow);
+                                jpFileRow.add(jlFileName);
+                                jPanel.add(jpFileRow);
+                                jFrame.validate();
+                            } else {
 
-                            jFrame.validate();
-                        }
+                                jpFileRow.setName((String.valueOf(fileId)));
 
-                        myFiles.add(new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName)));
+                                jpFileRow.add(jlFileName);
+                                jPanel.add(jpFileRow);
 
-                        fileId++;
+                                jFrame.validate();
+                            }
 
-                        File fileToSave = new File("src/server_files/" + fileName);
-                        try {
+                            myFiles.add(new MyFile(fileId, fileName, fileContentBytes, getFileExtension(fileName)));
 
-                            FileOutputStream fileOutputStream = new FileOutputStream(fileToSave);
+                            fileId++;
 
-                            fileOutputStream.write(fileContentBytes);
+                            File fileToSave = new File("src/server_files/" + fileName);
+                            try {
 
-                            fileOutputStream.close();
+                                FileOutputStream fileOutputStream = new FileOutputStream(fileToSave);
 
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
+                                fileOutputStream.write(fileContentBytes);
+
+                                fileOutputStream.close();
+
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     }
+                } else if (opName.equals("delete")) {
+                    int FileId = dataInputStream.readInt();
+                    System.out.println("received id " + FileId);
+
+                    for (int i = 0; i < allFiles.size(); i++) {
+                        if (FileId == allFiles.get(i).id) {
+                            File f = new File("src/server_files/" + allFiles.get(i).name);
+                            System.out.println(f.delete());
+                            System.out.println(allFiles.get(i).name);
+                            allFiles.remove(allFiles.get(i));
+                            System.out.println("after removal " + allFiles.size());
+                       
+
+                        }
+                    }
+                } else if (opName.equals("download")) {
+
+                    os = socket.getOutputStream();
+                    ObjectOutputStream oos = new ObjectOutputStream(os);
+                    oos.writeObject(allFiles);
+                    //oos.close();
+
                 }
+
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
+                if (e.getMessage().equals("Socket is closed")) {
+                    //break;
+                }
+                socket.close();
+
+                //break;
+                //e.printStackTrace();
             }
         }
 
@@ -183,6 +224,7 @@ public class Server {
                 fileId++;
 
                 System.out.println(newFile.getId() + " " + newFile.getName() + " " + newFile.getData().length + " " + newFile.getFileExtension());
+                fileInputStream.close();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
