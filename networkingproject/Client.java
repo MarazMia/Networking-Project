@@ -61,7 +61,7 @@ public class Client {
         JPanel option = new JPanel();
         option.setBorder(new EmptyBorder(5, 0, 0, 0));
         option.setFont(new Font("Arial", Font.BOLD, 20));
-        option.setBackground(Color.RED);
+        option.setBackground(Color.GRAY);
 
         JLabel hl = new JLabel("host   ");
         JTextField hostOption = new JTextField("localhost", 10);
@@ -79,7 +79,7 @@ public class Client {
         JPanel conPane = new JPanel();
         conPane.setBorder(new EmptyBorder(5, 0, 0, 0));
         conPane.setFont(new Font("Arial", Font.BOLD, 20));
-        conPane.setBackground(Color.GREEN);
+        
         conPane.setAlignmentY(Component.CENTER_ALIGNMENT);
         JLabel con = new JLabel("connection status");
         conState = new JTextField("not connected", 18);
@@ -93,14 +93,14 @@ public class Client {
         fileName.setBorder(new EmptyBorder(5, 0, 0, 0));
         fileName.setFont(new Font("Arial", Font.BOLD, 20));
         fileName.setAlignmentX(Component.CENTER_ALIGNMENT);
-        fN.setBackground(Color.RED);
+        fN.setBackground(Color.GRAY);
         fN.add(fileName);
 
         //button part
         JPanel jButtons = new JPanel();
         jButtons.setBorder(new EmptyBorder(50, 0, 10, 0));
         jButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
-        jButtons.setBackground(Color.RED);
+        jButtons.setBackground(Color.GRAY);
 
         sendFile = new JButton("upload");
         sendFile.setFont(new Font("Arial", Font.BOLD, 15));
