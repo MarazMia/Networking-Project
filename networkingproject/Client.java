@@ -34,7 +34,7 @@ public class Client {
     static JFrame jFramel;
     static JPanel jPanell;
     static JScrollPane jScrollPane;
-    static JLabel jlTitle;
+    static JLabel JlTitle;
     static JPanel jpFileRow;
     static JLabel jlFileName;
     static JButton sendFile;
@@ -42,6 +42,7 @@ public class Client {
     static JButton seeFile;
     static JTextField conState;
     static DataOutputStream dataOutputStream = null;
+    static JLabel fileName;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         //our project window
@@ -89,7 +90,7 @@ public class Client {
 
         //file name label
         JPanel fN = new JPanel();
-        JLabel fileName = new JLabel("choose a file to send...");
+        fileName = new JLabel("choose a file to send...");
         fileName.setBorder(new EmptyBorder(5, 0, 0, 0));
         fileName.setFont(new Font("Arial", Font.BOLD, 20));
         fileName.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -182,9 +183,9 @@ public class Client {
                             FileInputStream fileInputStream = new FileInputStream(fileToSend[0].getAbsolutePath());
                             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
-                            String fileName = fileToSend[0].getName();
+                            String FileName = fileToSend[0].getName();
 
-                            byte[] fileNameBytes = fileName.getBytes();
+                            byte[] fileNameBytes = FileName.getBytes();
 
                             byte[] fileBytes = new byte[(int) fileToSend[0].length()];
 
@@ -201,9 +202,9 @@ public class Client {
                             dataOutputStream.writeInt(fileBytes.length);
 
                             dataOutputStream.write(fileBytes);
-                            allFiles.add(new MyFile(allFiles.size(), fileName, fileBytes, getFileExtension(fileName)));
+                            allFiles.add(new MyFile(allFiles.size(), FileName, fileBytes, getFileExtension(FileName)));
                             fileInputStream.close();
-
+                            fileName.setText("succesfully uploaded");
                         }
                     } catch (IOException error) {
 
@@ -255,15 +256,15 @@ public class Client {
 
                 jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-                jlTitle = new JLabel("File Lists");
+                JlTitle = new JLabel("File Lists");
 
-                jlTitle.setFont(new Font("Arial", Font.BOLD, 25));
+                JlTitle.setFont(new Font("Arial", Font.BOLD, 25));
 
-                jlTitle.setBorder(new EmptyBorder(20, 0, 10, 0));
+                JlTitle.setBorder(new EmptyBorder(20, 0, 10, 0));
 
-                jlTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+                JlTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-                jFramel.add(jlTitle);
+                jFramel.add(JlTitle);
                 jFramel.add(jScrollPane);
 
                 jFramel.setVisible(true);
@@ -381,7 +382,9 @@ public class Client {
 
                     fileOutputStream.close();
 
+                    JlTitle.setText("one file downloaded on your documents folder");
                     jFrame.dispose();
+                    
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -409,10 +412,13 @@ public class Client {
                             break;
                         }
                     }
+                    
+                    
 
                     jPanell.removeAll();
                     jFramel.revalidate();
                     jFramel.repaint();
+                    JlTitle.setText("one file deleted");
                     fileLists();
 
                     jFrame.dispose();
