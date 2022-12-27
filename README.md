@@ -11,7 +11,7 @@ It's a linux based system for uploading, downloading and deleting files from a s
 
 
 # Codes
-It's a Java swing application wit socket programming features.
+It's a Java swing application with socket programming features.
 ![Preview](https://github.com/MarazMia/Networking-Project/blob/master/ss1.png)
 
 
